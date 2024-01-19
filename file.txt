@@ -1,1 +1,94 @@
-Воздушный насос для шин автомобильный портативный воздушный компрессор для шин воздушный насос 12 В беспроводной насос для накачки шин Электрический насос для автоматического воздушного компрессораИнформация о товаре:Название: беспроводной воздушный насосНоминальное напряжение: 12 ВНоминальный ток: ≤ 8AНоминальная мощность: ≤ 100WРасход воздуха: 35 л/минВыходное давление воздуха: 150 фунтов на квадратный дюймХарактеристики цилиндра: 22 ммШум: 80 дБМатериал: АБС + сплавВремя зарядки: 2,5 чЕмкость литиевой батареи: 2000 мАч * 3 /5CВремя непрерывной работы от аккумулятора: 20 мин.Упаковочный листВоздушный насос x 1【Быстрое надувание и автоотключение】Наш беспроводной насос для накачивания шин имеет мощное Сжатие воздуха до 150 фунтов на квадратный дюйм, что может накачать ваши автомобильные шины за секунды, экономя драгоценное время. Он автоматически отключится, как только будет достигнуто заданное значение давления. Так что вам не нужно беспокоиться о накачивании или низком давлении в шинах. Примечание: Не подходит для больших грузовых шин и больших внедорожников.【Цифровые счетчики и светодиодные лампы】Цифровой ЖК-экран для легкой предустановки 4 различных единиц измерения (фунт/кв. Дюйм, кПа, бар и кг/см2). Вы также можете предварительно установить целевое давление или проверить состояние давления с помощью нашего насоса для шин воздушного компрессора. С ярким светодиодным светом он может освещаться даже в темных местах и может использоваться срочно ночью.【Источник питания USB 】Оснащен перезаряжаемой литиевой батареей 2000mAh * 3, которая поддерживает зарядку несколько раз, идеально подходит для повседневного использования. Мы также предоставляем портативный USB-кабель питания, который можно напрямую подключить к адаптеру телефона для большей простоты и удобства.【Экономия места и портативность】С чехлом для переноски наш насос для накачки шин не занимает много места, что позволяет положить его в машину и вовремя помочь вам. Легкая и прочная конструкция может использоваться одной рукой, что очень удобно для повседневного использования.【Многофункциональная бесплатность】Наш воздушный насос оснащен 4 дополнительными насадками, которые не только подходят для автомобилей, мотоциклов и велосипедов, но также идеально подходят для спасательных поплавков, спортивных мячей, надувных лодок и других надувных лодок и т. д.Быстрое надувание беспроводное портативное Надувное устройствоAl умный/3X2000mAh/мощный
+CREATE TABLE Cars(
+    code_car INT NOT NULL PRIMARY KEY,
+    code_driver INT NOT NULL,
+    code_marks INT NOT NULL,
+    number VARCHAR(255) NOT NULL,
+    vin VARCHAR(255) NOT NULL,
+    vin_engine VARCHAR(255) NOT NULL,
+    number_techpass VARCHAR(255) NOT NULL,
+    date_release DATE NOT NULL,
+    date_reg DATE NOT NULL,
+    color VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    id_employee BIGINT NOT NULL
+);
+CREATE TABLE Ranks(
+    rank_code INT NOT NULL PRIMARY KEY,
+    rank_names VARCHAR(255) NOT NULL,
+    allowance VARCHAR(255) NOT NULL,
+    duties VARCHAR(255) NOT NULL,
+    requirements VARCHAR(255) NOT NULL
+);
+CREATE TABLE technical_inspection(
+    code_car INT NOT NULL PRIMARY KEY,
+    description BIGINT NOT NULL,
+    date_tech BIGINT NOT NULL
+);
+CREATE TABLE Car_brands(
+    code_marks INT NOT NULL PRIMARY KEY,
+    names VARCHAR(255) NOT NULL,
+    retailer VARCHAR(255) NOT NULL,
+    country VARCHAR(255) NOT NULL,
+    date_start DATE NOT NULL,
+    date_end DATE NOT NULL,
+    specifications TEXT NOT NULL,
+    category VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL
+);
+CREATE TABLE Drivers(
+    code_driver INT NOT NULL PRIMARY KEY,
+    fio VARCHAR(255) NOT NULL,
+    date_birthday DATE NOT NULL,
+    adres VARCHAR(255) NOT NULL,
+    passport VARCHAR(255) NOT NULL,
+    driver_number INT NOT NULL,
+    date_of_issue DATE NOT NULL,
+    date_end DATE NOT NULL,
+    cat CHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    id_employee INT NOT NULL
+);
+CREATE TABLE Stolen_cars(
+    date_theft INT NOT NULL PRIMARY KEY,
+    date_appeal DATE NOT NULL,
+    code_car INT NOT NULL,
+    code_driver INT NOT NULL,
+    circumstances TEXT NOT NULL,
+    mark_find INT NOT NULL,
+    date_find DATE NOT NULL,
+    id_employee INT NOT NULL
+);
+CREATE TABLE Employees(
+    Employee_ID INT NOT NULL PRIMARY KEY,
+    FIO_OF_EMPLOYEE TEXT NOT NULL,
+    OLD_OF_EMPLOYEE INT NOT NULL,
+    Gender_OF_EMPLOYEE TEXT NOT NULL,
+    ADRESS_OF_EMPLOYEE VARCHAR(255) NOT NULL,
+    Phone VARCHAR(255) NOT NULL,
+    PASSPORT_OF_EMPLOYEE VARCHAR(255) NOT NULL,
+    POSITION_ID INT NOT NULL,
+    RANK_CODE INT NOT NULL
+);
+CREATE TABLE Positions(
+    id_position INT NOT NULL PRIMARY KEY,
+    name_position VARCHAR(255) NOT NULL,
+    salary DOUBLE(8, 2) NOT NULL,
+    duties VARCHAR(255) NOT NULL,
+    requirements TEXT NOT NULL
+);
+ALTER TABLE
+    Cars ADD CONSTRAINT cars_code_marks_foreign FOREIGN KEY(code_marks) REFERENCES Car_brands(code_marks);
+ALTER TABLE
+    Employees ADD CONSTRAINT employees_position_id_foreign FOREIGN KEY(POSITION_ID) REFERENCES Positions(id_position);
+ALTER TABLE
+    Cars ADD CONSTRAINT cars_id_employee_foreign FOREIGN KEY(id_employee) REFERENCES Employees(Employee_ID);
+ALTER TABLE
+    Cars ADD CONSTRAINT cars_code_driver_foreign FOREIGN KEY(code_driver) REFERENCES Drivers(code_driver);
+ALTER TABLE
+    Employees ADD CONSTRAINT employees_rank_code_foreign FOREIGN KEY(RANK_CODE) REFERENCES Ranks(rank_code);
+ALTER TABLE
+    Drivers ADD CONSTRAINT drivers_id_employee_foreign FOREIGN KEY(id_employee) REFERENCES Employees(Employee_ID);
+ALTER TABLE
+    technical_inspection ADD CONSTRAINT technical_inspection_code_car_foreign FOREIGN KEY(code_car) REFERENCES Cars(code_car);
+ALTER TABLE
+    Stolen_cars ADD CONSTRAINT stolen_cars_code_car_foreign FOREIGN KEY(code_car) REFERENCES Cars(code_car);

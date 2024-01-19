@@ -8,7 +8,7 @@ try:
         content = file.read()
 
     # Удаляем все переносы строк
-    content_without_newlines = content.replace('\n', '')
+    content_without_newlines = content.replace('TINYINT(1)', 'INT')
 
     # Открываем файл на запись
     with open(file_path, 'w', encoding='utf-8') as file:
