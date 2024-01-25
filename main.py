@@ -1,93 +1,72 @@
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.model_selection import GridSearchCV
-from skimage import io
-import joblib
-from skimage.transform import resize
-import numpy as np
-import pandas as pd
 import csv
+import joblib
+import numpy as np
+from skimage import io
+from skimage.transform import resize
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
+
+cat_list = [
+    "беспроводные наушники",
+    "женская футболка",
+    "женские кроссовки",
+    "светодиодная лента",
+    "чехол на телефон",
+]
 
 
+def read_image(id: int):
+    """
+    Загрузка и привидение изображений к одному размеру
+    """
+    image = io.imread(f"categories\{category}\images\image_{id}.jpg")
+    return resize(image, (100, 100)).flatten()
 
 
-# Assuming 'data.csv' has columns: image_path, name, description, sales
-data = []
+for category in cat_list:
+    data = []
 
-with open('мужская футболка/data.csv', newline='', encoding='utf-8') as csvfile:
-    reader = csv.DictReader(csvfile, delimiter=';')
-    for row in reader:
-        print(row)
-        data.append({
-            "id": row['id'],
-            "name": row['name'],
-            "sold": int(row['sold']),
-            "price": int(row['price']),
-            "tags": (row['tags'])
-        })
+    with open(
+        f"categories/{category}/data.csv", newline="", encoding="utf-8"
+    ) as csvfile:
+        for row in csv.DictReader(csvfile, delimiter=";"):
+            data.append(
+                {
+                    "id": row["id"],
+                    "name": row["name"],
+                    "sold": int(row["sold"]),
+                    "price": int(row["price"]),
+                    "tags": (row["tags"]),
+                }
+            )
 
+    data = data[-30:]
+    image_features = []
+    text_features = []
 
-print("Извлечение признаков из изображений")
-image_features = []
-for item in data:
-    id = int(item["id"])
-    image_path = f"мужская футболка\images\image_{id}.jpg"
-    image = io.imread(image_path)
-    resized_image = resize(image, (100, 100))  # Приведем изображения к одному размеру для простоты
-    flattened_image = resized_image.flatten()
-    image_features.append(flattened_image)
+    for item in data:
+        image_features.append(read_image(int(item["id"])))
+        text_features.append(item["name"] + " " + item["tags"])
 
-print("Извлечение признаков из текстов (названий и описаний товаров)")
-text_features = []
-for item in data:
-    text_features.append(item["name"] + " " + item["tags"])
+    vectorizer = TfidfVectorizer()
 
-# Векторизация текста
-vectorizer = TfidfVectorizer()
+    text_features = np.array(vectorizer.fit_transform(text_features).toarray())
+    price_feature = np.array([item["price"] for item in data])[:, np.newaxis]
 
+    # Объединение признаков
+    X = np.concatenate((image_features, text_features, price_feature), axis=1)
+    y = np.array([item["sold"] for item in data])
 
-text_features = vectorizer.fit_transform(text_features).toarray()
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
 
-# Извлечение признака "price"
-price_feature = np.array([item["price"] for item in data])[:, np.newaxis]
+    model = RandomForestRegressor(
+        n_jobs=-1, verbose=5, min_samples_leaf=2, n_estimators=30, max_depth=6
+    )
 
-# Объединение признаков
-print(" Объединение признаков")
-X = np.concatenate((image_features, text_features, price_feature), axis=1)
-y = np.array([item["sold"] for item in data])
+    model.fit(X_train, y_train)
 
-print(" Разделение на обучающий и тестовый наборы")
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-print(" Создание и обучение модели случайного леса")
-model = RandomForestRegressor()
-
-#model.fit(X_train, y_train)
-
-#model = RandomForestClassifier()
-parameters = {'max_features':np.arange(5,10),'n_estimators':[500,1000,1500],'max_depth':[2,4,8,16]}
-model = GridSearchCV(model, parameters, cv = 5)
-model.fit(X,y)
-
-
-#Оценка модели
-train_score = model.score(X_train, y_train)
-test_score = model.score(X_test, y_test)
-
-print(f"Train R^2 Score: {train_score:.2f}")
-print(f"Test R^2 Score: {test_score:.2f}")
-
-joblib.dump(model, 'm_shirt.joblib')
-print("сохранение")
-
-
-# Пример предсказания для нового товара
-#data = {"image_path": "image/image5.jpg", "name": "Воздушный насос", 
-#        "description": "Воздушный насос для шин автомобильный портативный воздушный компрессор для шин воздушный насос 12 Воздушный насос для шин автомобильный портативный воздушный компрессор для шин воздушный насос 12Воздушный насос для шин автомобильный портативный воздушный компрессор для шин воздушный насос 12Воздушный насос для шин автомобильный портативный воздушный компрессор для шин воздушный насос 12Воздушный насос для шин автомобильный портативный воздушный компрессор для шин воздушный насос 12Воздушный насос для шин автомобильный портативный воздушный компрессор для шин воздушный насос 12Воздушный насос для шин автомобильный портативный воздушный компрессор для шин воздушный насос 12Воздушный насос для шин автомобильный портативный воздушный компрессор для шин воздушный насос 12 В беспроводной насос для накачки шин Электрический насос для автоматического воздушного компрессораИнформация о товаре:Название: беспроводной воздушный насосНоминальное напряжение: 12 ВНоминальный ток: ≤ 8AНоминальная мощность: ≤ 100WРасход воздуха: 35 л/минВыходное давление воздуха: 150 фунтов на квадратный дюймХарактеристики цилиндра: 22 ммШум: 80 дБМатериал: АБС + сплавВремя зарядки: 2,5 чЕмкость литиевой батареи: 2000 мАч * 3 /5CВремя непрерывной работы от аккумулятора: 20 мин.Упаковочный листВоздушный насос x 1【Быстрое надувание и автоотключение】Наш беспроводной насос для накачивания шин имеет мощное Сжатие воздуха до 150 фунтов на квадратный дюйм, что может накачать ваши автомобильные шины за секунды, экономя драгоценное время. Он автоматически отключится, как только будет достигнуто заданное значение давления. Так что вам не нужно беспокоиться о накачивании или низком давлении в шинах. Примечание: Не подходит для больших грузовых шин и больших внедорожников.【Цифровые счетчики и светодиодные лампы】Цифровой ЖК-экран для легкой предустановки 4 различных единиц измерения (фунт/кв. Дюйм, кПа, бар и кг/см2). Вы также можете предварительно установить целевое давление или проверить состояние давления с помощью нашего насоса для шин воздушного компрессора. С ярким светодиодным светом он может освещаться даже в темных местах и может использоваться срочно ночью.【Источник питания USB 】Оснащен перезаряжаемой литиевой батареей 2000mAh * 3, которая поддерживает зарядку несколько раз, идеально подходит для повседневного использования. Мы также предоставляем портативный USB-кабель питания, который можно напрямую подключить к адаптеру телефона для большей простоты и удобства.【Экономия места и портативность】С чехлом для переноски наш насос для накачки шин не занимает много места, что позволяет положить его в машину и вовремя помочь вам. Легкая и прочная конструкция может использоваться одной рукой, что очень удобно для повседневного использования.【Многофункциональная бесплатность】Наш воздушный насос оснащен 4 дополнительными насадками, которые не только подходят для автомобилей, мотоциклов и велосипедов, но также идеально подходят для спасательных поплавков, спортивных мячей, надувных лодок и других надувных лодок и т. д.Быстрое надувание беспроводное портативное Надувное устройствоAl умный/3X2000mAh/мощный"  }
-# Извлечение признаков из изображений
-
-
-
-
+    joblib.dump(model, f"{category}.joblib")
+    print("сохранение")
