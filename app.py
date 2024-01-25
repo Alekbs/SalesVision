@@ -37,21 +37,28 @@ model_configs = {
     },
 }
 
+
 class PageWidget:
     def __init__(self, page: ft.Page):
         self._page = page
         self._choose_category_label = ft.Text("Выберите категорию товаров: ")
         self._selected_category = ft.Text()
-        self._dropdown = ft.Dropdown(options=[ft.dropdown.Option(item) for item in all_categories], width=200)
+        self._dropdown = ft.Dropdown(
+            options=[ft.dropdown.Option(item) for item in all_categories], width=200
+        )
         self._filepath_text = ft.Text(value="Selected file path")
         self._filepicker = ft.FilePicker(on_result=self._return_file)
         self._filepicker_row = self._create_filepicker_row()
-        self._file_preview = ft.Image(src=f"{self._filepath_text.value}", width=200, height=200)
+        self._file_preview = ft.Image(
+            src=f"{self._filepath_text.value}", width=200, height=200
+        )
         self._file_preview_container = ft.Container(content=self._file_preview)
         self._name_field = ft.TextField(label="Введите название", autofocus=True)
         self._price_field = ft.TextField(label="Цена", autofocus=True)
         self._predict_text = ft.Text()
-        self._predict_btn = ft.ElevatedButton(text="Предсказать", on_click=self._button_clicked)
+        self._predict_btn = ft.ElevatedButton(
+            text="Предсказать", on_click=self._button_clicked
+        )
 
         page.title = "SalesVision"
 
@@ -72,14 +79,18 @@ class PageWidget:
             self._price_field,
             ft.Divider(thickness=1),
             self._predict_btn,
-            self._predict_text
+            self._predict_text,
         )
 
         self._page.update()
 
     def _create_filepicker_row(self):
         row = ft.Row()
-        row.controls.append(ft.ElevatedButton(text="Выберите изображение...", on_click=self._select_file))
+        row.controls.append(
+            ft.ElevatedButton(
+                text="Выберите изображение...", on_click=self._select_file
+            )
+        )
         row.controls.append(self._filepath_text)
 
         return row
@@ -106,7 +117,7 @@ class PageWidget:
                 f"{self._file_preview.src}",
                 self._name_field.value,
                 self._price_field.value,
-                model_config["size"]
+                model_config["size"],
             )
             self._predict_text.value = f"Количество продаж: {predicted_sold_value}"
 
