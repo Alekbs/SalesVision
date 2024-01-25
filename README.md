@@ -14,9 +14,9 @@
 
 ## Запуск
 - Установка зависимостей:
-    `.\venv\bin\activate`
+    - `.\venv\bin\activate`
 
-    `py -m pip install -r requirements.txt`
+    - `py -m pip install -r requirements.txt`
 
 - Запуск обучения модели:
     `py main.py`
