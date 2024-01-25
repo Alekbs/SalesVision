@@ -1,5 +1,5 @@
 import flet as ft
-from client import predict
+from utils import predict
 
 all_categories = [
     "Беспроводные наушники",
