@@ -13,7 +13,7 @@ def read_image(image_path: str):
     return resize(image, (100, 100)).flatten()
 
 
-def predict(name_model, image_path, name, price, size):
+def predict(name_model: str, image_path: str, name: str, price: int, size: int) -> int:
     """
     Предсказание для нового товара
     """
